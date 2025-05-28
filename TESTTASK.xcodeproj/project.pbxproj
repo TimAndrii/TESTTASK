@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5DABAB512DE7351C00C14FB9 /* README.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5DABAB4F2DE7351C00C14FB9 /* README.strings */; };
 		5DED89DD2DE5D72600D93D73 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 5DED89DC2DE5D72600D93D73 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5DABAB502DE7351C00C14FB9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/README.strings; sourceTree = "<group>"; };
 		5DD0FC8E2DE499D000E6CAC3 /* TESTTASK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TESTTASK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +52,7 @@
 		5DD0FC852DE499D000E6CAC3 = {
 			isa = PBXGroup;
 			children = (
+				5DABAB4F2DE7351C00C14FB9 /* README.strings */,
 				5DD0FC902DE499D000E6CAC3 /* TESTTASK */,
 				5DD0FC8F2DE499D000E6CAC3 /* Products */,
 			);
@@ -131,6 +134,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DABAB512DE7351C00C14FB9 /* README.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +149,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		5DABAB4F2DE7351C00C14FB9 /* README.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5DABAB502DE7351C00C14FB9 /* en */,
+			);
+			name = README.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		5DD0FC972DE499D200E6CAC3 /* Debug */ = {
