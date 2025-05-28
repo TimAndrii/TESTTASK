@@ -1,0 +1,39 @@
+/* 
+  README.strings
+  TESTTASK
+
+  Created by Andrii Tymoshchuk on 28.05.2025.
+  
+*/
+
+/*
+//MARK: README
+
+
+ 1. Configuration options and how to customize them.
+    No additional configurations are required.
+
+ 2. Dependencies and any external libraries used.
+    Alamofire.
+
+ 3. Troubleshooting tips and common issues.
+    -
+
+ 4. Instructions on how to build the application.
+    1. Open `testtask.xcodeproj` in Xcode 16.2.
+    2. Make sure the simulator selected (eg iPhone 16).
+    3. Press ⌘+r to start.
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
