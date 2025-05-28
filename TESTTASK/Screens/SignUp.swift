@@ -48,102 +48,12 @@ struct SignUp: View {
             BannerView(title: "Working with POST request")
 
             ScrollView {
-                VStack(alignment: .leading) {
-                    VStack {
-                        ForEach(FieldType.allCases, id: \.self) { field in
-                            if field != .photo {
-                                if let binding = bindingFieldType(for: field) {
-                                    CustomField(textField: binding,
-                                                prompt: field.prompt,
-                                                isValidate: validateFields(fieldType: field).0,
-                                                infoText: validateFields(fieldType: field).1
-                                    )
-                                    .focused($focusedField, equals: field)
-                                    .onChange(of: focusedField) { oldValue, newValue in
-                                        if let old = oldValue, old == field {
-                                            focusedFields[old] = true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.top, 32)
-
-                    VStack(alignment: .leading) {
-                        Text("Select your position")
-                            .font(.NSMedium18)
-                            .padding(.leading, 16)
-
-                        ForEach(Positions.allCases, id: \.self) { posType in
-                            RadioButton(label: posType, isSelected: position == posType) {
-                                position = posType
-                            }
-                            .animation(.bouncy, value: position)
-                        }
-                    }
-                    .padding(.top, 24)
-
-                    VStack {
-                        CustomPhotoField(
-                            isSourcePresented: $isSourceDialogShown,
-                            isPickerPresented: $isPickerPresented,
-                            selectedImage: $image,
-                            sourceType: sourceType,
-                            isValidate: photoValidation.0
-                        )
-                        .padding(.bottom, 24)
-                        .confirmationDialog("Select Image Source", isPresented: $isSourceDialogShown, titleVisibility: .visible) {
-                            Button("Take Photo") {
-                                sourceType = .camera
-                                isPickerPresented = true
-                            }
-
-                            Button("Choose from Gallery") {
-                                sourceType = .photoLibrary
-                                isPickerPresented = true
-                            }
-
-                            Button("Cancel", role: .cancel) {}
-                        }
-                    }
-
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            if validateAllData() {
-                                if image != nil {
-                                    let user = LocalUserModel(name: name, email: email.lowercased(), photo: image!, phone: phone, positionID: position.id)
-                                    NetworkManager.shared.registerUser(user: user) { status in
-                                        infoStatusView = status
-                                    }
-                                } else {
-                                    focusedFields[.photo] = true
-                                }
-                            } else {
-                                focusedFields = FieldType.allCases.reduce(into: [FieldType: Bool]()) { result, field in
-                                    result[field] = true
-                                }
-                            }
-                        }) {
-                            Text("Sign up")
-                                .foregroundStyle(.black)
-                                .frame(width: 140, height: 48)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 24)
-                                        .fill(Color.YellowAppColor)
-                                )
-                        }
-                        Spacer()
-                    }
-
-                    Spacer()
-                }
+                formContent()
             }
         }
         .overlay {
             Group {
-                if infoStatusView == .success {
+                if infoStatusView != nil {
                     InfoScreenView(
                         imageName: "success",
                         title: "User successfully registered",
@@ -151,34 +61,28 @@ struct SignUp: View {
                         showXButton: true,
                         showMainButton: true,
                         buttonAction: {
-                            infoStatusView = nil
-                            tabSelection = .users
-                            hideTab = false
+                            if infoStatusView == .success {
+                                infoStatusView = nil
+                                tabSelection = .users
+                                hideTab = false
+                            } else if infoStatusView == .duplicatedEmailOrPhone {
+                                infoStatusView = nil
+                                hideTab = false
+                            }
+
                         },
                         buttonXAction: {
-                            infoStatusView = nil
-                            tabSelection = .users
-                            hideTab = false
+                            if infoStatusView == .success {
+                                infoStatusView = nil
+                                tabSelection = .users
+                                hideTab = false
+                            } else if infoStatusView == .duplicatedEmailOrPhone {
+                                infoStatusView = nil
+                                hideTab = false
+                            }
+
                         }
                     )
-                } else if infoStatusView == .duplicatedEmailOrPhone {
-                    InfoScreenView(
-                        imageName: "unsuccess",
-                        title: "That email is already registered",
-                        buttonTitle: "Try again",
-                        showXButton: true,
-                        showMainButton: true,
-                        buttonAction: {
-                            infoStatusView = nil
-                            hideTab = false
-                        },
-                        buttonXAction: {
-                            infoStatusView = nil
-                            hideTab = false
-                        }
-                    )
-                } else {
-                    EmptyView()
                 }
             }
             .animation(.spring, value: infoStatusView)
@@ -219,6 +123,77 @@ struct SignUp: View {
     private func validateAllData() -> Bool {
         FieldType.allCases.allSatisfy { field in
             validateFields(fieldType: field).0
+        }
+    }
+
+    private func formContent() -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack {
+                ForEach(FieldType.allCases, id: \.self) { field in
+                    if field != .photo {
+                        if let binding = bindingFieldType(for: field) {
+                            CustomField(
+                                textField: binding,
+                                prompt: field.prompt,
+                                isValidate: validateFields(fieldType: field).0,
+                                infoText: validateFields(fieldType: field).1
+                            )
+                            .focused($focusedField, equals: field)
+                            .onChange(of: focusedField) { oldValue, newValue in
+                                if let old = oldValue, old == field {
+                                    focusedFields[old] = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 32)
+
+            PositionsView(position: $position)
+
+            PhotoFieldView(isSourceDialogShown: $isSourceDialogShown,
+                           isPickerPresented: $isPickerPresented,
+                           image: $image,
+                           sourceType: $sourceType,
+                           photoValidation: photoValidation.0)
+
+            HStack {
+                Spacer()
+                Button(action: {
+                    if validateAllData() {
+                        if image != nil {
+                            let user = LocalUserModel(
+                                name: name,
+                                email: email.lowercased(),
+                                photo: image!,
+                                phone: phone,
+                                positionID: position.id
+                            )
+                            NetworkManager.shared.registerUser(user: user) { status in
+                                infoStatusView = status
+                            }
+                        } else {
+                            focusedFields[.photo] = true
+                        }
+                    } else {
+                        focusedFields = FieldType.allCases.reduce(into: [FieldType: Bool]()) { result, field in
+                            result[field] = true
+                        }
+                    }
+                }) {
+                    Text("Sign up")
+                        .foregroundStyle(.black)
+                        .frame(width: 140, height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .fill(Color.YellowAppColor)
+                        )
+                }
+                Spacer()
+            }
+
+            Spacer()
         }
     }
 }
